@@ -1,0 +1,95 @@
+﻿{
+  mcpServers: {
+    supabase: {
+      command: npx,
+      args: [
+        -y,
+        @supabase/mcp-server-supabase@latest
+      ],
+      env: {
+        SUPABASE_ACCESS_TOKEN: "
+ }
+ },
+ vercel: {
+ command: npx,
+ args: [
+ -y,
+ vercel-mcp-pro
+ ],
+ env: {
+ VERCEL_TOKEN: 
+ }
+ },
+ github-mcp-server: {
+ command: docker,
+ args: [
+ run,
+ -i,
+ --rm,
+ -e,
+ GITHUB_PERSONAL_ACCESS_TOKEN,
+ ghcr.io/github/github-mcp-server
+ ],
+ env: {
+ GITHUB_PERSONAL_ACCESS_TOKEN: 
+ }
+ },
+ chrome-devtools: {
+ command: npx,
+ args: [
+ -y,
+ chrome-devtools-mcp@latest
+ ]
+ },
+ shadcn: {
+ command: npx,
+ args: [
+ -y,
+ shadcn@latest,
+ mcp
+ ]
+ },
+ magicui: {
+ command: npx,
+ args: [
+ -y,
+ @magicuidesign/mcp@latest
+ ]
+ },
+ aceternity: {
+ command: npx,
+ args: [
+ -y,
+ aceternityui-mcp
+ ]
+ },
+ uiverse: {
+ command: npx,
+ args: [
+ -y,
+ github:Fabi-SPL/uiverse-mcp
+ ]
+ },
+ StitchMCP: {
+ command: npx,
+ args: [
+ -y,
+ mcp-remote,
+ https://stitch.googleapis.com/mcp,
+ --header,
+ X-Goog-Api-Key: 
+ ]
+ },
+ magic-mcp: {
+ command: npx,
+ args: [
+ -y,
+ @21st-dev/magic@latest
+ ],
+ disabled: true,
+ env: {
+ API_KEY_21ST: 
+ }
+ }
+ }
+}
