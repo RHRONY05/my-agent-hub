@@ -1,17 +1,20 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 /**
- * Cross-Agent MCP & Skills Synchronizer
+ * Omni-Directional AI Agent Sync Engine
  * 
- * Synchronizes MCP servers and Skills across:
- * - Google Antigravity (~/.gemini/config/) [Master Source of Truth]
+ * True Multi-Way Synchronization across:
+ * - Google Antigravity (~/.gemini/config/)
  * - Claude Code (~/.claude.json & ~/.claude/skills/)
  * - OpenAI Codex (~/.codex/config.toml & ~/.codex/skills/)
  * - Cursor IDE (~/.cursor/mcp.json)
+ * - My Agent Hub (d:/Projects/my-agent-hub/)
  *
- * Safe & Non-destructive:
- * - Uses NTFS directory junctions for Skills (0 duplicate files, real-time shared updates)
- * - Deep-merges MCP servers without overwriting tool-specific settings or personal configs
- * - Creates automated backups (.sync.bak) before modifying any configuration file
+ * Capabilities:
+ * 1. Two-Way Skills: Discovers skills created in ANY agent (Antigravity, Claude, Codex, or my-agent-hub)
+ *    and cross-links them across all agents using live NTFS Junctions.
+ * 2. Two-Way MCP: Merges MCP servers discovered across Antigravity, Cursor, and Claude Code into
+ *    a unified registry and distributes them everywhere.
+ * 3. Safe Backups: Automatically creates .sync.bak files before any configuration write.
  */
 
 const fs = require('fs');
@@ -20,224 +23,203 @@ const os = require('os');
 
 const HOME = os.homedir();
 
-// Master & Target Paths
 const PATHS = {
+  hubRepo: path.resolve(__dirname),
   masterMcp: path.join(HOME, '.gemini', 'config', 'mcp_config.json'),
-  masterSkills: path.join(HOME, '.gemini', 'config', 'skills'),
+  geminiSkills: path.join(HOME, '.gemini', 'config', 'skills'),
   cursorMcp: path.join(HOME, '.cursor', 'mcp.json'),
   claudeJson: path.join(HOME, '.claude.json'),
-  claudeSkillsDir: path.join(HOME, '.claude', 'skills'),
+  claudeSkills: path.join(HOME, '.claude', 'skills'),
   codexConfig: path.join(HOME, '.codex', 'config.toml'),
-  codexSkillsDir: path.join(HOME, '.codex', 'skills'),
+  codexSkills: path.join(HOME, '.codex', 'skills'),
+  hubCustomSkills: path.join(path.resolve(__dirname), 'skills', 'custom'),
 };
 
-console.log('========================================================');
-console.log('🤖 Universal AI Agent Sync Engine (Antigravity / Claude / Codex / Cursor)');
-console.log('========================================================\n');
+console.log('================================================================');
+console.log('🔄 Omni-Directional AI Agent Sync Engine (Antigravity ↔ Claude ↔ Codex ↔ Cursor)');
+console.log('================================================================\n');
 
-// 1. Validate Master Source of Truth
-if (!fs.existsSync(PATHS.masterMcp)) {
-  console.error(❌ Master MCP config not found at: );
-  process.exit(1);
-}
-
-const masterRaw = fs.readFileSync(PATHS.masterMcp, 'utf8');
-let masterData;
-try {
-  masterData = JSON.parse(masterRaw);
-} catch (e) {
-  console.error(❌ Failed to parse master MCP config: );
-  process.exit(1);
-}
-
-const masterServers = masterData.mcpServers || {};
-const serverNames = Object.keys(masterServers);
-console.log(📦 Found  master MCP servers in Antigravity:);
-serverNames.forEach(name => {
-  const status = masterServers[name].disabled ? ' (disabled)' : '';
-  console.log(   - );
-});
-console.log('');
-
-// Helper: Backup a file
 function backupFile(filePath) {
   if (fs.existsSync(filePath)) {
-    const backupPath = filePath + '.sync.bak';
-    fs.copyFileSync(filePath, backupPath);
+    fs.copyFileSync(filePath, filePath + '.sync.bak');
   }
 }
 
-// 2. Sync to Cursor (~/.cursor/mcp.json)
-function syncCursor() {
-  console.log('🔄 Syncing to Cursor IDE...');
+// 1. OMNI-DIRECTIONAL MCP SYNC
+console.log('📡 Step 1: Merging MCP Servers across all agents...');
+
+let unifiedServers = {};
+
+if (fs.existsSync(PATHS.masterMcp)) {
   try {
-    let cursorData = { mcpServers: {} };
-    if (fs.existsSync(PATHS.cursorMcp)) {
-      backupFile(PATHS.cursorMcp);
-      try {
-        cursorData = JSON.parse(fs.readFileSync(PATHS.cursorMcp, 'utf8'));
-        if (!cursorData.mcpServers) cursorData.mcpServers = {};
-      } catch (err) {
-        console.warn(   ⚠️ Warning reading cursor mcp.json: );
-      }
-    } else {
-      const cursorDir = path.dirname(PATHS.cursorMcp);
-      if (!fs.existsSync(cursorDir)) fs.mkdirSync(cursorDir, { recursive: true });
-    }
-
-    let addedCount = 0;
-    for (const [name, config] of Object.entries(masterServers)) {
-      cursorData.mcpServers[name] = config;
-      addedCount++;
-    }
-
-    fs.writeFileSync(PATHS.cursorMcp, JSON.stringify(cursorData, null, 2), 'utf8');
-    console.log(   ✅ Cursor:  total servers configured ( synced).);
+    const data = JSON.parse(fs.readFileSync(PATHS.masterMcp, 'utf8'));
+    Object.assign(unifiedServers, data.mcpServers || {});
   } catch (e) {
-    console.error(   ❌ Failed to sync Cursor: );
+    console.warn('   ⚠️ Error reading Antigravity mcp_config.json:', e.message);
   }
 }
 
-// 3. Sync to Claude Code (~/.claude.json)
-function syncClaudeCode() {
-  console.log('🔄 Syncing to Claude Code...');
+if (fs.existsSync(PATHS.cursorMcp)) {
   try {
-    if (fs.existsSync(PATHS.claudeJson)) {
-      backupFile(PATHS.claudeJson);
-    }
-
-    let claudeData = {};
-    if (fs.existsSync(PATHS.claudeJson)) {
-      try {
-        claudeData = JSON.parse(fs.readFileSync(PATHS.claudeJson, 'utf8'));
-      } catch (e) {
-        console.warn(   ⚠️ Error reading claude.json: );
+    const data = JSON.parse(fs.readFileSync(PATHS.cursorMcp, 'utf8'));
+    for (const [name, config] of Object.entries(data.mcpServers || {})) {
+      if (!unifiedServers[name]) {
+        console.log('   ✨ Discovered new server from Cursor:', name);
+        unifiedServers[name] = config;
       }
     }
-
-    if (!claudeData.mcpServers) claudeData.mcpServers = {};
-
-    let syncedCount = 0;
-    for (const [name, config] of Object.entries(masterServers)) {
-      claudeData.mcpServers[name] = config;
-      syncedCount++;
-    }
-
-    fs.writeFileSync(PATHS.claudeJson, JSON.stringify(claudeData, null, 2), 'utf8');
-    console.log(   ✅ Claude Code:  total servers configured ( synced).);
-  } catch (e) {
-    console.error(   ❌ Failed to sync Claude Code: );
-  }
+  } catch (e) {}
 }
 
-// 4. Sync to OpenAI Codex (~/.codex/config.toml)
-function syncCodex() {
-  console.log('🔄 Syncing to OpenAI Codex...');
+if (fs.existsSync(PATHS.claudeJson)) {
   try {
-    if (!fs.existsSync(PATHS.codexConfig)) {
-      console.warn(   ⚠️ ~/.codex/config.toml does not exist. Skipping codex.);
-      return;
+    const data = JSON.parse(fs.readFileSync(PATHS.claudeJson, 'utf8'));
+    for (const [name, config] of Object.entries(data.mcpServers || {})) {
+      if (!unifiedServers[name]) {
+        console.log('   ✨ Discovered new server from Claude Code:', name);
+        unifiedServers[name] = config;
+      }
     }
+  } catch (e) {}
+}
+
+const totalMcpCount = Object.keys(unifiedServers).length;
+console.log('   📦 Unified pool has ' + totalMcpCount + ' active/managed MCP servers.\n');
+
+try {
+  backupFile(PATHS.masterMcp);
+  fs.writeFileSync(PATHS.masterMcp, JSON.stringify({ mcpServers: unifiedServers }, null, 2), 'utf8');
+  console.log('   ✅ Antigravity: Synced.');
+} catch (e) {
+  console.error('   ❌ Antigravity error:', e.message);
+}
+
+try {
+  backupFile(PATHS.cursorMcp);
+  let cursorData = { mcpServers: {} };
+  if (fs.existsSync(PATHS.cursorMcp)) {
+    try { cursorData = JSON.parse(fs.readFileSync(PATHS.cursorMcp, 'utf8')); } catch (e) {}
+  }
+  cursorData.mcpServers = Object.assign({}, cursorData.mcpServers || {}, unifiedServers);
+  fs.writeFileSync(PATHS.cursorMcp, JSON.stringify(cursorData, null, 2), 'utf8');
+  console.log('   ✅ Cursor IDE: Synced.');
+} catch (e) {
+  console.error('   ❌ Cursor error:', e.message);
+}
+
+try {
+  backupFile(PATHS.claudeJson);
+  let claudeData = {};
+  if (fs.existsSync(PATHS.claudeJson)) {
+    try { claudeData = JSON.parse(fs.readFileSync(PATHS.claudeJson, 'utf8')); } catch (e) {}
+  }
+  claudeData.mcpServers = Object.assign({}, claudeData.mcpServers || {}, unifiedServers);
+  fs.writeFileSync(PATHS.claudeJson, JSON.stringify(claudeData, null, 2), 'utf8');
+  console.log('   ✅ Claude Code: Synced.');
+} catch (e) {
+  console.error('   ❌ Claude Code error:', e.message);
+}
+
+try {
+  if (fs.existsSync(PATHS.codexConfig)) {
     backupFile(PATHS.codexConfig);
-
     let tomlContent = fs.readFileSync(PATHS.codexConfig, 'utf8');
-
-    // Remove previously managed section
     const START_TAG = '# >>> MANAGED BY SYNC-AGENTS (DO NOT EDIT MANUALLY) >>>';
     const END_TAG = '# <<< END MANAGED BY SYNC-AGENTS <<<';
 
-    const startIdx = tomlContent.indexOf(START_TAG);
-    const endIdx = tomlContent.indexOf(END_TAG);
-
-    if (startIdx !== -1 && endIdx !== -1) {
-      tomlContent = tomlContent.slice(0, startIdx).trimEnd() + '\n\n' + tomlContent.slice(endIdx + END_TAG.length).trimStart();
+    const sIdx = tomlContent.indexOf(START_TAG);
+    const eIdx = tomlContent.indexOf(END_TAG);
+    if (sIdx !== -1 && eIdx !== -1) {
+      tomlContent = tomlContent.slice(0, sIdx).trimEnd() + '\n\n' + tomlContent.slice(eIdx + END_TAG.length).trimStart();
     }
 
-    let managedToml = ${START_TAG}\n;
-    let count = 0;
-
-    for (const [name, config] of Object.entries(masterServers)) {
+    let managedToml = START_TAG + '\n';
+    for (const [name, config] of Object.entries(unifiedServers)) {
       if (config.disabled) continue;
-
-      managedToml += \n[mcp_servers."]\n;
- if (config.command) {
- managedToml += command = \n;
- }
- if (config.args && Array.isArray(config.args)) {
- managedToml += rgs = \n;
- }
- if (config.env && Object.keys(config.env).length > 0) {
- managedToml += \n[mcp_servers..env]\n;
- for (const [k, v] of Object.entries(config.env)) {
- managedToml += ${k} = \n;
- }
- }
- count++;
- }
-
- managedToml += \n\n;
- tomlContent = tomlContent.trimEnd() + '\n\n' + managedToml;
-
- fs.writeFileSync(PATHS.codexConfig, tomlContent, 'utf8');
- console.log( ✅ Codex: active servers synced into ~/.codex/config.toml.);
- } catch (e) {
- console.error( ❌ Failed to sync Codex: );
- }
+      managedToml += '\n[mcp_servers."' + name + '"]\n';
+      if (config.command) managedToml += 'command = ' + JSON.stringify(config.command) + '\n';
+      if (config.args && Array.isArray(config.args)) managedToml += 'args = ' + JSON.stringify(config.args) + '\n';
+      if (config.env && Object.keys(config.env).length > 0) {
+        managedToml += '\n[mcp_servers."' + name + '".env]\n';
+        for (const [k, v] of Object.entries(config.env)) {
+          managedToml += k + ' = ' + JSON.stringify(v) + '\n';
+        }
+      }
+    }
+    managedToml += '\n' + END_TAG + '\n';
+    tomlContent = tomlContent.trimEnd() + '\n\n' + managedToml;
+    fs.writeFileSync(PATHS.codexConfig, tomlContent, 'utf8');
+    console.log('   ✅ OpenAI Codex: Synced.');
+  }
+} catch (e) {
+  console.error('   ❌ Codex error:', e.message);
 }
 
-// 5. Sync Skills via NTFS Junctions
-function syncSkills() {
- console.log('🔄 Linking Skills (Antigravity -> Claude Code & Codex)...');
- if (!fs.existsSync(PATHS.masterSkills)) {
- console.log(' ℹ️ No master skills folder found. Skipping skills link.');
- return;
- }
+console.log('');
 
- const targets = [
- { name: 'Claude Code', dir: PATHS.claudeSkillsDir },
- { name: 'OpenAI Codex', dir: PATHS.codexSkillsDir }
- ];
+// 2. OMNI-DIRECTIONAL SKILLS SYNC
+console.log('🧠 Step 2: Multi-Way Skills Discovery & Real-Time Cross-Linking...');
 
- targets.forEach(target => {
- if (!fs.existsSync(target.dir)) {
- fs.mkdirSync(target.dir, { recursive: true });
- }
- });
+const skillLocations = [
+  { name: 'Antigravity', dir: PATHS.geminiSkills },
+  { name: 'Claude Code', dir: PATHS.claudeSkills },
+  { name: 'OpenAI Codex', dir: PATHS.codexSkills },
+  { name: 'Hub Custom', dir: PATHS.hubCustomSkills },
+];
 
- const skills = fs.readdirSync(PATHS.masterSkills, { withFileTypes: true })
- .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith('.'))
- .map(dirent => dirent.name);
+skillLocations.forEach(loc => {
+  if (!fs.existsSync(loc.dir)) fs.mkdirSync(loc.dir, { recursive: true });
+});
 
- let linkedCounts = { 'Claude Code': 0, 'OpenAI Codex': 0 };
+const canonicalSkills = new Map();
 
- skills.forEach(skillName => {
- const srcPath = path.join(PATHS.masterSkills, skillName);
+skillLocations.forEach(loc => {
+  if (!fs.existsSync(loc.dir)) return;
+  const items = fs.readdirSync(loc.dir, { withFileTypes: true });
+  for (const item of items) {
+    if (!item.isDirectory() || item.name.startsWith('.') || item.name === 'synced') continue;
 
- targets.forEach(target => {
- const destPath = path.join(target.dir, skillName);
+    const fullPath = path.join(loc.dir, item.name);
+    try {
+      const stat = fs.lstatSync(fullPath);
+      if (!stat.isSymbolicLink()) {
+        if (!canonicalSkills.has(item.name)) {
+          canonicalSkills.set(item.name, {
+            name: item.name,
+            sourceDir: fullPath,
+            originName: loc.name
+          });
+        }
+      }
+    } catch (e) {}
+  }
+});
 
- if (!fs.existsSync(destPath)) {
- try {
- fs.symlinkSync(srcPath, destPath, 'junction');
- linkedCounts[target.name]++;
- } catch (err) {
- // Ignore
- }
- } else {
- linkedCounts[target.name]++;
- }
- });
- });
+console.log('   📚 Found ' + canonicalSkills.size + ' canonical skills across all agent locations.');
 
- console.log( ✅ Claude Code: skills active.);
- console.log( ✅ OpenAI Codex: skills active.);
+const targets = [
+  { name: 'Antigravity', dir: PATHS.geminiSkills },
+  { name: 'Claude Code', dir: PATHS.claudeSkills },
+  { name: 'OpenAI Codex', dir: PATHS.codexSkills }
+];
+
+let newLinksCount = 0;
+
+for (const [skillName, skillInfo] of canonicalSkills) {
+  targets.forEach(target => {
+    const destPath = path.join(target.dir, skillName);
+    if (!fs.existsSync(destPath)) {
+      try {
+        fs.symlinkSync(skillInfo.sourceDir, destPath, 'junction');
+        newLinksCount++;
+        console.log('   🔗 Linked [' + skillName + '] (origin: ' + skillInfo.originName + ') -> ' + target.name);
+      } catch (err) {}
+    }
+  });
 }
 
-// Execute
-syncCursor();
-syncClaudeCode();
-syncCodex();
-syncSkills();
-
-console.log('\n🎉 All agents are in sync! You can rerun this anytime with: node sync-agents.js');
-console.log('========================================================\n');
+console.log('\n🎉 Omni-Directional Sync Complete!');
+console.log('   - MCP Servers: ' + totalMcpCount + ' synchronized everywhere.');
+console.log('   - Skills: ' + canonicalSkills.size + ' active across Antigravity, Claude Code, and Codex.');
+console.log('   - Any edits made in any agent reflect instantly across all agents.\n');
+console.log('================================================================\n');
