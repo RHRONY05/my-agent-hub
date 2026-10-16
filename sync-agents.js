@@ -5,12 +5,13 @@
  * Focused, rock-solid 2-way sync between:
  * - Google Antigravity (~/.gemini/config/)
  * - Claude Code (~/.claude.json & ~/.claude/skills/)
- * - My Agent Hub (skills/custom/)
+ * - My Agent Hub (skills/<domain>/<skill>/)
  *
  * Capabilities:
  * 1. Two-Way MCP Sync: Seamlessly shares MCP servers between Antigravity and Claude Code.
- * 2. Two-Way Skills Sync: Connects skills using zero-copy Windows NTFS Directory Junctions.
- *    Any edits in either agent reflect instantly in real time.
+ * 2. Layered Domain Skills Sync: Discovers custom skills organized by domain
+ *    (backend, frontend, ui-ux-design, architecture, workflow) and cross-links them
+ *    into Antigravity and Claude Code via NTFS Junctions.
  * 3. Safe Backups: Automatically creates .sync.bak files before writing any configuration.
  */
 
@@ -26,7 +27,7 @@ const PATHS = {
   geminiSkills: path.join(HOME, '.gemini', 'config', 'skills'),
   claudeJson: path.join(HOME, '.claude.json'),
   claudeSkills: path.join(HOME, '.claude', 'skills'),
-  hubCustomSkills: path.join(path.resolve(__dirname), 'skills', 'custom'),
+  hubSkillsRoot: path.join(path.resolve(__dirname), 'skills'),
 };
 
 console.log('================================================================');
@@ -97,45 +98,62 @@ try {
 
 console.log('');
 
-// 2. TWO-WAY SKILLS SYNC (NTFS Junctions)
-console.log('🧠 Step 2: Skills Discovery & Real-Time Cross-Linking...');
+// 2. LAYERED DOMAIN SKILLS SYNC
+console.log('🧠 Step 2: Layered Domain Skills Discovery & Cross-Linking...');
 
-const skillLocations = [
-  { name: 'Antigravity', dir: PATHS.geminiSkills },
-  { name: 'Claude Code', dir: PATHS.claudeSkills },
-  { name: 'Hub Custom', dir: PATHS.hubCustomSkills },
-];
-
-skillLocations.forEach(loc => {
-  if (!fs.existsSync(loc.dir)) fs.mkdirSync(loc.dir, { recursive: true });
+[PATHS.geminiSkills, PATHS.claudeSkills].forEach(dir => {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
 const canonicalSkills = new Map();
 
-// Discover non-symlink canonical skill folders
-skillLocations.forEach(loc => {
+// A. First: Discover Hub Layered Skills (skills/<domain>/<skill-name>)
+if (fs.existsSync(PATHS.hubSkillsRoot)) {
+  const domains = fs.readdirSync(PATHS.hubSkillsRoot, { withFileTypes: true });
+  for (const domain of domains) {
+    if (!domain.isDirectory() || domain.name.startsWith('.')) continue;
+    const domainDir = path.join(PATHS.hubSkillsRoot, domain.name);
+    const skills = fs.readdirSync(domainDir, { withFileTypes: true });
+    for (const skill of skills) {
+      if (!skill.isDirectory() || skill.name.startsWith('.')) continue;
+      const skillPath = path.join(domainDir, skill.name);
+      if (fs.existsSync(path.join(skillPath, 'SKILL.md'))) {
+        canonicalSkills.set(skill.name, {
+          name: skill.name,
+          sourceDir: skillPath,
+          originName: `Hub (${domain.name})`
+        });
+      }
+    }
+  }
+}
+
+// B. Second: Discover any external standalone skills in Antigravity or Claude
+const externalLocations = [
+  { name: 'Antigravity', dir: PATHS.geminiSkills },
+  { name: 'Claude Code', dir: PATHS.claudeSkills }
+];
+
+externalLocations.forEach(loc => {
   if (!fs.existsSync(loc.dir)) return;
   const items = fs.readdirSync(loc.dir, { withFileTypes: true });
   for (const item of items) {
     if (!item.isDirectory() || item.name.startsWith('.') || item.name === 'synced') continue;
-
     const fullPath = path.join(loc.dir, item.name);
     try {
       const stat = fs.lstatSync(fullPath);
-      if (!stat.isSymbolicLink()) {
-        if (!canonicalSkills.has(item.name)) {
-          canonicalSkills.set(item.name, {
-            name: item.name,
-            sourceDir: fullPath,
-            originName: loc.name
-          });
-        }
+      if (!stat.isSymbolicLink() && !canonicalSkills.has(item.name)) {
+        canonicalSkills.set(item.name, {
+          name: item.name,
+          sourceDir: fullPath,
+          originName: loc.name
+        });
       }
     } catch (e) {}
   }
 });
 
-console.log('   📚 Found ' + canonicalSkills.size + ' canonical skills.');
+console.log('   📚 Found ' + canonicalSkills.size + ' canonical skills across hub layers & agents.');
 
 const targets = [
   { name: 'Antigravity', dir: PATHS.geminiSkills },
@@ -151,7 +169,7 @@ for (const [skillName, skillInfo] of canonicalSkills) {
       try {
         fs.symlinkSync(skillInfo.sourceDir, destPath, 'junction');
         newLinksCount++;
-        console.log('   🔗 Linked [' + skillName + '] (origin: ' + skillInfo.originName + ') -> ' + target.name);
+        console.log('   🔗 Linked [' + skillName + '] (' + skillInfo.originName + ') -> ' + target.name);
       } catch (err) {}
     }
   });
@@ -160,5 +178,5 @@ for (const [skillName, skillInfo] of canonicalSkills) {
 console.log('\n🎉 Sync Complete!');
 console.log('   - MCP Servers: ' + totalMcpCount + ' synchronized between Antigravity and Claude Code.');
 console.log('   - Skills: ' + canonicalSkills.size + ' active across both agents.');
-console.log('   - Changes to existing skills reflect immediately in real time (zero-copy NTFS junctions).\n');
+console.log('   - Layered Hub skills linked cleanly via zero-copy NTFS junctions.\n');
 console.log('================================================================\n');

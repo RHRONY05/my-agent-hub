@@ -32,8 +32,12 @@ my-agent-hub/
 │   └── mcp_config.template.json   # Sanitized master template with ${VAR} placeholders
 │
 ├── skills/
-│   ├── CATALOG.md                 # Categorized catalog of all 45+ domain skills
-│   └── custom/                    # My handwritten custom skills
+│   ├── CATALOG.md                 # Categorized catalog of all skills
+│   ├── backend/                   # Backend standards & scaffolding
+│   ├── architecture/              # System diagrams & project planning
+│   ├── frontend/                  # Frontend implementation & performance audits
+│   ├── ui-ux-design/              # Design canvas, UI styling & UI-UX-Pro-Max
+│   └── workflow/                  # Active recall QA reviews & agent handoffs
 │
 ├── plugins/
 │   └── CATALOG.md                 # Catalog of installed plugins (chrome-devtools, gemini-api, etc.)
