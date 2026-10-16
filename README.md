@@ -1,18 +1,20 @@
 # 🤖 My Agent Hub
 
-> **Personal AI Agent Dotfiles & Command Center**  
-> Unified Model Context Protocol (MCP) servers, domain skills, and workflows shared seamlessly between **Google Antigravity** and **Claude Code**.
+> **My Personal AI Agent Dotfiles & Command Center**  
+> Unified Model Context Protocol (MCP) servers, domain skills, and custom workflows shared seamlessly between **Google Antigravity** and **Claude Code**.
 
 ---
 
 ## ⚡ What is This?
 
-Instead of fragmenting agent configurations, API keys, and custom skills, **My Agent Hub** acts as the single source of truth for your primary AI coding setup:
+This repository is my personal command center and dotfiles for AI coding agents. Instead of fragmenting tool configurations, API keys, and custom skills across different locations, this hub acts as the single source of truth for my workflow:
 
-- **11 MCP Servers (200+ Tools)**: Synced seamlessly between **Antigravity** (IDE) and **Claude Code** (CLI).
-- **45+ Domain Skills**: Real-time linked via Windows NTFS Directory Junctions (zero file duplication).
-- **Zero Secret Leaks**: Sanitized templates committed to Git; real API keys stored in local `.env`.
-- **1-Command Sync**: Run `node sync-agents.js` to reconcile tools and link new skills across both environments.
+- **Primary IDE**: **Google Antigravity** (`~/.gemini/config/`)
+- **Secondary CLI**: **Claude Code** (`~/.claude.json` & `~/.claude/skills/`)
+- **11 MCP Servers (200+ Tools)**: Reconciled and synced across both environments.
+- **45+ Domain Skills**: Linked live via Windows NTFS Directory Junctions (zero duplicate files; edits reflect instantly across both agents).
+- **Sanitized for Git**: All committed templates use `${VAR}` placeholders, keeping real tokens safely in my local `.env`.
+- **1-Command Sync**: Running `node sync-agents.js` reconciles tools and links any new custom skills.
 
 ---
 
@@ -20,61 +22,63 @@ Instead of fragmenting agent configurations, API keys, and custom skills, **My A
 
 ```text
 my-agent-hub/
-├── README.md                      # Command center dashboard
-├── sync-agents.js                 # Focused 2-way sync engine (Antigravity ↔ Claude Code)
+├── README.md                      # Personal dashboard & workflow reference
+├── sync-agents.js                 # 2-way sync engine (Antigravity ↔ Claude Code)
 ├── .env.example                   # API token template (Supabase, Vercel, GitHub, etc.)
 ├── .gitignore                     # Ignores .env, *.bak, and sensitive files
 │
 ├── mcp/
-│   ├── CATALOG.md                 # Full breakdown of all 11 MCP servers and tools
-│   └── mcp_config.template.json   # Master sanitized template with ${VAR} placeholders
+│   ├── CATALOG.md                 # Breakdown of all 11 MCP servers & tools I use
+│   └── mcp_config.template.json   # Sanitized master template with ${VAR} placeholders
 │
 ├── skills/
 │   ├── CATALOG.md                 # Categorized catalog of all 45+ domain skills
-│   └── custom/                    # Your handwritten custom skills
+│   └── custom/                    # My handwritten custom skills
 │
 ├── plugins/
 │   └── CATALOG.md                 # Catalog of installed plugins (chrome-devtools, gemini-api, etc.)
 │
 └── docs/
-    └── AGENT_SYNC.md              # Architecture and maintenance guide
+    └── AGENT_SYNC.md              # Architecture, junction details & maintenance guide
 ```
 
 ---
 
-## 🚀 Quick Start (New Machine Setup)
+## 💻 How I Set Up / Restore on My Machine
+
+My reference steps whenever setting up a new Windows workstation or restoring my configuration:
 
 1. **Clone this repository:**
    ```bash
-   git clone <your-repo-url> d:\Projects\my-agent-hub
+   git clone <my-repo-url> d:\Projects\my-agent-hub
    cd d:\Projects\my-agent-hub
    ```
 
-2. **Configure your API keys:**
+2. **Populate my local secrets:**
    ```bash
    copy .env.example .env
-   # Open .env and add your SUPABASE_ACCESS_TOKEN, VERCEL_TOKEN, GITHUB_TOKEN
+   # Add SUPABASE_ACCESS_TOKEN, VERCEL_TOKEN, GITHUB_TOKEN, etc.
    ```
 
-3. **Run the synchronizer:**
+3. **Run the sync script:**
    ```bash
    node sync-agents.js
    ```
 
-Both **Antigravity** and **Claude Code** will immediately share all MCP servers and skills.
+Both **Antigravity** and **Claude Code** are immediately configured with my full tool inventory and skills.
 
 ---
 
-## 🛠️ Supported Agents & Config Paths
+## 🛠️ My Agent Environments & Config Paths
 
-| Agent | Config Target | Format | Status |
+| Agent | Config Target | Format | Role |
 | :--- | :--- | :--- | :--- |
 | **Google Antigravity** | `~/.gemini/config/mcp_config.json` | JSON | Primary IDE (`~/.gemini/config/skills/`) |
 | **Claude Code** | `~/.claude.json` | JSON | Secondary CLI (`~/.claude/skills/`) |
 
 ---
 
-## 📜 Catalogs & References
+## 📜 Catalogs & Notes
 
 - [MCP Server Catalog](mcp/CATALOG.md) — Descriptions and tools for Supabase, Vercel, GitHub, DevTools, etc.
 - [Skills Catalog](skills/CATALOG.md) — Index of UI/UX, Backend, Cloud, AI, and Safety runbooks.
