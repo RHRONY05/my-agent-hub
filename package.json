@@ -1,0 +1,10 @@
+{
+  "name": "my-agent-hub",
+  "version": "1.0.0",
+  "description": "Personal AI Agent Dotfiles & Command Center",
+  "private": true,
+  "scripts": {
+    "sync": "node sync-agents.js",
+    "backup-skills": "node backup-skills.js"
+  }
+}

@@ -73,6 +73,22 @@ Both **Antigravity** and **Claude Code** are immediately configured with my full
 
 ---
 
+## 🔄 Weekly Routine: Backing Up Skills
+
+Whenever skills are edited or improved during coding sessions, I run this to pull changes back into this repo:
+
+```bash
+node backup-skills.js
+# Or: npm run backup-skills
+```
+
+- Compares live files in `~/.gemini/config/skills/` against `my-agent-hub/skills/<domain>/`.
+- Safely copies updated or newly added files into this repo.
+- Detects any new custom skills created in Antigravity so I can categorize them.
+- Once done, run `git commit` to push updates to GitHub.
+
+---
+
 ## 🛠️ My Agent Environments & Config Paths
 
 | Agent | Config Target | Format | Role |

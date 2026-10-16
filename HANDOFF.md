@@ -57,8 +57,12 @@ my-agent-hub/
 │   └── CATALOG.md                 # Full breakdown of all MCP servers, tools, and usage
 │
 ├── skills/
-│   ├── custom/                    # Dedicated folder for user's own custom skills
-│   └── CATALOG.md                 # Catalog of all 45+ skills categorized by domain
+│   ├── CATALOG.md                 # Catalog of all skills categorized by domain
+│   ├── backend/                   # Backend standards & scaffolding
+│   ├── architecture/              # System diagrams & project planning
+│   ├── frontend/                  # Frontend implementation & performance audits
+│   ├── ui-ux-design/              # Design canvas, UI styling & UI-UX-Pro-Max
+│   └── workflow/                  # Active recall QA reviews & agent handoffs
 │
 ├── plugins/
 │   └── CATALOG.md                 # Catalog of installed plugins (gemini-api, chrome-devtools, etc.)
@@ -70,9 +74,13 @@ my-agent-hub/
 ---
 
 ## 4. Operational Commands
-* **Run Sync Engine**:
+* **Synchronize Environment**:
   ```powershell
   node sync-agents.js
+  ```
+* **Backup Weekly Skill Edits to Hub**:
+  ```powershell
+  node backup-skills.js
   ```
 * **Verify Claude Code Connection**:
   ```powershell
