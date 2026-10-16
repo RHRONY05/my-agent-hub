@@ -44,14 +44,15 @@ The sync engine performs a safe 2-way merge:
 Whenever a new MCP server or skill is added in either tool, run from this directory:
 
 ```bash
-node sync-agents.js
+npm run sync
+# Or: node scripts/sync-agents.js
 ```
 
 ### What happens when you run it:
 1. Reads `C:\Users\Asus\.gemini\config\mcp_config.json` and `C:\Users\Asus\.claude.json`.
 2. Backs up existing config files (`.sync.bak`).
 3. Writes the synchronized MCP configuration to both clients.
-4. Creates directory junctions for any newly discovered skills in `~/.gemini/config/skills/`, `~/.claude/skills/`, or `skills/custom/`.
+4. Creates directory junctions for any newly discovered skills in `skills/<domain>/`.
 
 ---
 
@@ -85,7 +86,7 @@ You don't need heavy third-party proxy middleware to prevent tool bloat:
 If any agent encounters issues:
 1. **Verify JSON files**: Check `~/.gemini/config/mcp_config.json` and `~/.claude.json` for syntax errors.
 2. **Check Claude Code CLI health**: Run `claude mcp list` in PowerShell/terminal.
-3. **Re-run the sync script**: Run `node sync-agents.js`.
+3. **Re-run the sync script**: Run `npm run sync` (or `node scripts/sync-agents.js`).
 4. **Restore from backups**: Every target file creates an automated `.sync.bak` file before writing. If a config ever gets corrupted, simply restore the `.bak` file:
    * `~/.claude.json.sync.bak`
    * `~/.gemini/config/mcp_config.json.sync.bak`

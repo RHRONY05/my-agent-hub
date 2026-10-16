@@ -14,7 +14,7 @@ This repository is my personal command center and dotfiles for AI coding agents.
 - **11 MCP Servers (200+ Tools)**: Reconciled and synced across both environments.
 - **45+ Domain Skills**: Linked live via Windows NTFS Directory Junctions (zero duplicate files; edits reflect instantly across both agents).
 - **Sanitized for Git**: All committed templates use `${VAR}` placeholders, keeping real tokens safely in my local `.env`.
-- **1-Command Sync**: Running `node sync-agents.js` reconciles tools and links any new custom skills.
+- **1-Command Sync**: Running `npm run sync` (or `node scripts/sync-agents.js`) reconciles tools and links skills.
 
 ---
 
@@ -22,10 +22,15 @@ This repository is my personal command center and dotfiles for AI coding agents.
 
 ```text
 my-agent-hub/
+├── AGENTS.md                      # AI agent instructions & codebase memory
 ├── README.md                      # Personal dashboard & workflow reference
-├── sync-agents.js                 # 2-way sync engine (Antigravity ↔ Claude Code)
+├── package.json                   # NPM shortcuts (npm run sync, npm run backup-skills)
 ├── .env.example                   # API token template (Supabase, Vercel, GitHub, etc.)
 ├── .gitignore                     # Ignores .env, *.bak, and sensitive files
+│
+├── scripts/
+│   ├── sync-agents.js             # 2-way sync engine (Antigravity ↔ Claude Code)
+│   └── backup-skills.js           # SHA-256 diff engine pulling skill modifications into Git
 │
 ├── mcp/
 │   ├── CATALOG.md                 # Breakdown of all 11 MCP servers & tools I use
@@ -66,7 +71,8 @@ My reference steps whenever setting up a new Windows workstation or restoring my
 
 3. **Run the sync script:**
    ```bash
-   node sync-agents.js
+   npm run sync
+   # Or: node scripts/sync-agents.js
    ```
 
 Both **Antigravity** and **Claude Code** are immediately configured with my full tool inventory and skills.
@@ -78,8 +84,8 @@ Both **Antigravity** and **Claude Code** are immediately configured with my full
 Whenever skills are edited or improved during coding sessions, I run this to pull changes back into this repo:
 
 ```bash
-node backup-skills.js
-# Or: npm run backup-skills
+npm run backup-skills
+# Or: node scripts/backup-skills.js
 ```
 
 - Compares live files in `~/.gemini/config/skills/` against `my-agent-hub/skills/<domain>/`.
@@ -100,6 +106,7 @@ node backup-skills.js
 
 ## 📜 Catalogs & Notes
 
+- [AGENTS.md](AGENTS.md) — Operational instructions and system context for AI agents working in this repo.
 - [MCP Server Catalog](mcp/CATALOG.md) — Descriptions and tools for Supabase, Vercel, GitHub, DevTools, etc.
 - [Skills Catalog](skills/CATALOG.md) — Index of UI/UX, Backend, Cloud, AI, and Safety runbooks.
 - [Plugins Catalog](plugins/CATALOG.md) — Overview of modular multi-skill plugin bundles.

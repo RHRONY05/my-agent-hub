@@ -22,12 +22,12 @@ const os = require('os');
 const HOME = os.homedir();
 
 const PATHS = {
-  hubRepo: path.resolve(__dirname),
+  hubRepo: path.resolve(__dirname, '..'),
   masterMcp: path.join(HOME, '.gemini', 'config', 'mcp_config.json'),
   geminiSkills: path.join(HOME, '.gemini', 'config', 'skills'),
   claudeJson: path.join(HOME, '.claude.json'),
   claudeSkills: path.join(HOME, '.claude', 'skills'),
-  hubSkillsRoot: path.join(path.resolve(__dirname), 'skills'),
+  hubSkillsRoot: path.join(path.resolve(__dirname, '..'), 'skills'),
 };
 
 console.log('================================================================');

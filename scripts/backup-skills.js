@@ -16,7 +16,7 @@ const os = require('os');
 const crypto = require('crypto');
 
 const HOME = os.homedir();
-const HUB_SKILLS_ROOT = path.join(__dirname, 'skills');
+const HUB_SKILLS_ROOT = path.join(__dirname, '..', 'skills');
 const GEMINI_SKILLS = path.join(HOME, '.gemini', 'config', 'skills');
 const PLUGINS_DIR = path.join(HOME, '.gemini', 'config', 'plugins');
 const DATACLOUD_MANIFEST = path.join(GEMINI_SKILLS, '.datacloud_skills_manifest');

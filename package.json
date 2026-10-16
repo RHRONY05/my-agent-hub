@@ -4,7 +4,7 @@
   "description": "Personal AI Agent Dotfiles & Command Center",
   "private": true,
   "scripts": {
-    "sync": "node sync-agents.js",
-    "backup-skills": "node backup-skills.js"
+    "sync": "node scripts/sync-agents.js",
+    "backup-skills": "node scripts/backup-skills.js"
   }
 }
