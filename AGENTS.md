@@ -1,7 +1,7 @@
 # AGENTS.md: Personal AI Agent Hub Context & Operational Guide
 
 > **System Context for AI Coding Agents**:  
-> This file is the primary context and operating manual for any AI assistant (Google Antigravity, Claude Code) working inside this repository (`d:\Projects\my-agent-hub`).
+> This file is the primary context and operating manual for any AI assistant (Google Antigravity, Claude Code) working inside this repository (`d:\Projects\my-agent-hub`)/ `https://github.com/RHRONY05/my-agent-hub`.
 
 ---
 
