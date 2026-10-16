@@ -1,68 +1,67 @@
-﻿# 🤖 My Agent Hub
+# 🤖 My Agent Hub
 
 > **Personal AI Agent Dotfiles & Command Center**  
-> Unified Model Context Protocol (MCP) servers, domain skills, and workflows shared seamlessly across **Google Antigravity**, **Claude Code**, **OpenAI Codex**, and **Cursor**.
+> Unified Model Context Protocol (MCP) servers, domain skills, and workflows shared seamlessly between **Google Antigravity** and **Claude Code**.
 
 ---
 
 ## ⚡ What is This?
 
-Instead of fragmenting agent configurations, API keys, and custom skills across multiple coding assistants, **My Agent Hub** acts as the single source of truth for all AI tools on this machine:
+Instead of fragmenting agent configurations, API keys, and custom skills, **My Agent Hub** acts as the single source of truth for your primary AI coding setup:
 
-- **10 MCP Servers (200+ Tools)**: Shared across Antigravity, Claude Code, Codex, and Cursor.
-- **44+ Domain Skills**: Real-time linked via Windows NTFS Directory Junctions (0 file duplication).
-- **Zero Secret Leaks**: Sanitized templates committed to Git; real API keys stored in local .env.
-- **1-Command Sync**: Run 
-ode sync-agents.js to update all coding agents simultaneously.
+- **11 MCP Servers (200+ Tools)**: Synced seamlessly between **Antigravity** (IDE) and **Claude Code** (CLI).
+- **45+ Domain Skills**: Real-time linked via Windows NTFS Directory Junctions (zero file duplication).
+- **Zero Secret Leaks**: Sanitized templates committed to Git; real API keys stored in local `.env`.
+- **1-Command Sync**: Run `node sync-agents.js` to reconcile tools and link new skills across both environments.
 
 ---
 
 ## 📁 Repository Structure
 
-`	ext
+```text
 my-agent-hub/
-├── README.md                      # This command center dashboard
-├── sync-agents.js                 # Universal sync engine (zero dependencies)
+├── README.md                      # Command center dashboard
+├── sync-agents.js                 # Focused 2-way sync engine (Antigravity ↔ Claude Code)
 ├── .env.example                   # API token template (Supabase, Vercel, GitHub, etc.)
 ├── .gitignore                     # Ignores .env, *.bak, and sensitive files
 │
 ├── mcp/
-│   ├── CATALOG.md                 # Full breakdown of all 10 MCP servers and tools
-│   └── mcp_config.template.json   # Master sanitized template with  placeholders
+│   ├── CATALOG.md                 # Full breakdown of all 11 MCP servers and tools
+│   └── mcp_config.template.json   # Master sanitized template with ${VAR} placeholders
 │
 ├── skills/
-│   ├── CATALOG.md                 # Categorized catalog of all 44+ domain skills
+│   ├── CATALOG.md                 # Categorized catalog of all 45+ domain skills
 │   └── custom/                    # Your handwritten custom skills
 │
 ├── plugins/
 │   └── CATALOG.md                 # Catalog of installed plugins (chrome-devtools, gemini-api, etc.)
 │
 └── docs/
-    └── AGENT_SYNC.md              # Deep-dive architecture and troubleshooting guide
-`
+    └── AGENT_SYNC.md              # Architecture and maintenance guide
+```
 
 ---
 
 ## 🚀 Quick Start (New Machine Setup)
 
 1. **Clone this repository:**
-   `ash
+   ```bash
    git clone <your-repo-url> d:\Projects\my-agent-hub
    cd d:\Projects\my-agent-hub
-   `
+   ```
 
 2. **Configure your API keys:**
-   `ash
+   ```bash
    copy .env.example .env
    # Open .env and add your SUPABASE_ACCESS_TOKEN, VERCEL_TOKEN, GITHUB_TOKEN
-   `
+   ```
 
-3. **Run the universal synchronizer:**
-   `ash
+3. **Run the synchronizer:**
+   ```bash
    node sync-agents.js
-   `
+   ```
 
-All installed agents (**Antigravity**, **Claude Code**, **Codex**, **Cursor**) will immediately be linked and configured with the exact same tools and skills.
+Both **Antigravity** and **Claude Code** will immediately share all MCP servers and skills.
 
 ---
 
@@ -70,10 +69,8 @@ All installed agents (**Antigravity**, **Claude Code**, **Codex**, **Cursor**) w
 
 | Agent | Config Target | Format | Status |
 | :--- | :--- | :--- | :--- |
-| **Google Antigravity** | ~/.gemini/config/mcp_config.json | JSON | Primary Master Source |
-| **Claude Code** | ~/.claude.json | JSON | Verified (claude mcp list) |
-| **OpenAI Codex** | ~/.codex/config.toml | TOML | Verified (codex mcp list) |
-| **Cursor IDE** | ~/.cursor/mcp.json | JSON | Verified |
+| **Google Antigravity** | `~/.gemini/config/mcp_config.json` | JSON | Primary IDE (`~/.gemini/config/skills/`) |
+| **Claude Code** | `~/.claude.json` | JSON | Secondary CLI (`~/.claude/skills/`) |
 
 ---
 
