@@ -41,7 +41,7 @@ my-agent-hub/
 ├── skills/
 │   ├── CATALOG.md                 # Index of all system skills and custom domain mappings
 │   ├── backend/                   # backend-standards
-│   ├── architecture/              # document-architecture, plan-project
+│   ├── architecture/              # db-docs, document-architecture, plan-project, plan-for-agent-build
 │   ├── frontend/                  # frontend-design, frontend-implementation, performance-audit
 │   ├── ui-ux-design/              # design-canvas, domain-asset-discovery, ui-styling, ui-ux-pro-max
 │   └── workflow/                  # generate-qa-review, handoff
