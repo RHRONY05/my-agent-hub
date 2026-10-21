@@ -40,6 +40,11 @@ This catalog indexes all skills available on this system. In this repository, cu
 | **`generate-qa-review`** | Analyzes project implementations and automatically generates high-yield Active Recall Q&A revision guides with collapsible answers. |
 | **`handoff`** | Generates a lightweight, structured state summary to hand off project context seamlessly to another AI agent or session. |
 
+### 🎓 6. Learning (`skills/learning/`)
+| Skill | Purpose |
+| :--- | :--- |
+| **`codebase-tutor`** | Turns any codebase into a guided course: inventories every feature (incl. hidden ones like cron jobs, DB triggers, health checks) into `.learn/FEATURES.md`, orders my picks into concept modules with a tracker and concept ledger, and teaches 2-3 features per session as premium lessons in `.learn/playground.md` (flow diagram, real code trace, real data, break-it, rebuild, recall). |
+
 ---
 
 ## 🔌 Plugin & Platform Skills (Auto-Managed)

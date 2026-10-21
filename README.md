@@ -42,7 +42,8 @@ my-agent-hub/
 │   ├── architecture/              # System diagrams & project planning
 │   ├── frontend/                  # Frontend implementation & performance audits
 │   ├── ui-ux-design/              # Design canvas, UI styling & UI-UX-Pro-Max
-│   └── workflow/                  # Active recall QA reviews & agent handoffs
+│   ├── workflow/                  # Active recall QA reviews & agent handoffs
+│   └── learning/                  # codebase-tutor: learning codebases as guided courses
 │
 ├── plugins/
 │   └── CATALOG.md                 # Catalog of installed plugins (chrome-devtools, gemini-api, etc.)
