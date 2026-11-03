@@ -12,7 +12,7 @@ This repository is my personal command center and dotfiles for AI coding agents.
 - **Primary IDE**: **Google Antigravity** (`~/.gemini/config/`)
 - **Secondary CLI**: **Claude Code** (`~/.claude.json` & `~/.claude/skills/`)
 - **11 MCP Servers (200+ Tools)**: Reconciled and synced across both environments.
-- **45+ Domain Skills**: Linked live via Windows NTFS Directory Junctions (zero duplicate files; edits reflect instantly across both agents).
+- **45+ Domain Skills**: One live copy per skill in Antigravity (real folders, because Antigravity ignores junctions), linked into Claude Code via NTFS Directory Junctions; `npm run backup-skills` pulls edits back into this repo.
 - **Sanitized for Git**: All committed templates use `${VAR}` placeholders, keeping real tokens safely in my local `.env`.
 - **1-Command Sync**: Running `npm run sync` (or `node scripts/sync-agents.js`) reconciles tools and links skills.
 

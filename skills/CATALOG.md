@@ -17,6 +17,7 @@ This catalog indexes all skills available on this system. In this repository, cu
 | **`document-architecture`** | Analyzes backend codebases, detects critical & complex API endpoints, and generates developer lifecycle diagrams, user flows, and complete API contract dictionaries. |
 | **`db-docs`** | Generates ER diagrams and per-table schema docs for PostgreSQL from the live database with tbls (via Docker), and keeps them in sync after every migration. Ships the runner script and `.tbls.yml` templates. |
 | **`plan-project`** | Interactive planning: divides projects into modular vertical slices and generates tracking documents (`AGENTS.md`, `project_tracker.md`) and design docs. |
+| **`visual-diagram`** | **On demand only** (`/visual-diagram <what>`). Draws one colourful, hand-laid-out SVG diagram (pastel boxes for people/apps, blue for the main system, purple circles for data, solid = read/trigger, dashed = write/return), links it from Markdown, and renders it in Edge to check for overlaps before showing it. Can output styled Mermaid instead. Ships `example-pipeline.svg` as the style reference. |
 | **`plan-for-agent-build`** | "Claude plans + designs, Antigravity builds": produces root `AGENTS.md` + `CLAUDE.md` and a full `.agent/` pack (product, architecture, DB, API, domain logic, finished desktop + mobile HTML designs, testing with e2e + Lighthouse targets, tasks with AC, PROGRESS, rules, workflows) plus the goal command for the builder. Examples: Vocab_App, Menuwala. |
 
 ### 💻 3. Frontend (`skills/frontend/`)

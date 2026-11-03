@@ -4,6 +4,8 @@ Last updated: YYYY-MM-DD
 
 ## Current position
 
+- **Phase:** <1: verify FEATURES.md and pick features · 2: approve the curriculum · 3: learning>
+- **Waiting on me:** <the one decision or action the student owes, or "nothing">
 - **Session:** M0.1 The Map (**Not Started**)
 - **Resume point:** <session · Part · step · next experiment · open questions>
 - **Code at:** `<commit hash>` (lessons below were written against this)
@@ -31,6 +33,10 @@ Last updated: YYYY-MM-DD
 - [ ] Note
 
 ---
+
+## Outside the curriculum
+
+<!-- trial lessons and detours taught before or outside `plan`; folded in at `plan` -->
 
 ## Weak spots (from quizzes)
 

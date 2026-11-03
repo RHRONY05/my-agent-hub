@@ -15,7 +15,7 @@ This repository is the developer's **Personal AI Agent Dotfiles & Command Center
 ### Core Responsibilities of This Repository:
 1. **MCP Configuration**: Reconciles and synchronizes 11 active MCP servers (200+ tools) between Antigravity and Claude Code.
 2. **Domain-Layered Skills**: Houses and version-controls 12 handwritten custom skills organized by domain layer (`backend`, `architecture`, `frontend`, `ui-ux-design`, `workflow`, `learning`).
-3. **Automated Cross-Linking**: Maintains zero-copy Windows NTFS Directory Junctions into agent skill folders.
+3. **Automated Cross-Linking**: Copies each skill into Antigravity as a real folder (Antigravity ignores junctions) and links Claude Code to it with a Windows NTFS Directory Junction.
 4. **Secret Sanitization**: Commits only sanitized templates (`mcp_config.template.json`) with `${VAR}` placeholders, keeping real credentials locally in `.env`.
 
 ---

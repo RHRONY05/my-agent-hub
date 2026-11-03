@@ -12,19 +12,19 @@ To prevent configuration drift, all MCP servers and skills are managed cleanly b
 | :--- | :--- | :--- |
 | **Antigravity MCP** | `C:\Users\Asus\.gemini\config\mcp_config.json` | Contains global tool configurations, commands, and credentials. |
 | **Claude Code MCP** | `C:\Users\Asus\.claude.json` | Contains Claude Code's active `mcpServers` configuration. |
-| **Antigravity Skills** | `C:\Users\Asus\.gemini\config\skills\` | 45+ modular skill folders with `SKILL.md` instructions and scripts. |
-| **Claude Code Skills** | `C:\Users\Asus\.claude\skills\` | Linked in real-time via NTFS Junctions. |
+| **Antigravity Skills** | `C:\Users\Asus\.gemini\config\skills\` | 45+ real skill folders: the live copy of every skill. |
+| **Claude Code Skills** | `C:\Users\Asus\.claude\skills\` | NTFS junctions into the Antigravity folders. |
 
 ---
 
 ## 2. How the Environments Connect
 
-### A. Skills Sharing (Zero Duplicate Files)
-Skills are shared across agents using **Windows NTFS Directory Junctions** (`fs.symlinkSync(src, dest, 'junction')`):
-* **Claude Code Target**: `C:\Users\Asus\.claude\skills\<skill-name>`
-* **Antigravity Target**: `C:\Users\Asus\.gemini\config\skills\<skill-name>`
+### A. Skills Sharing (One Live Copy)
+* **Antigravity** holds every skill as a **real folder** in `C:\Users\Asus\.gemini\config\skills\<skill-name>`. Antigravity does **not** follow directory junctions when it discovers skills, so a junction there makes the skill invisible (found 2026-10-25 with `codebase-tutor`, `db-docs` and `plan-for-agent-build`).
+* **Claude Code** gets a **Windows NTFS Directory Junction** (`fs.symlinkSync(antigravityFolder, claudePath, 'junction')`) at `C:\Users\Asus\.claude\skills\<skill-name>` that points at the Antigravity folder. Claude Code follows junctions.
+* **This hub** (`skills/<domain>/<skill-name>/`) is the version-controlled backup. `npm run sync` copies new hub skills into Antigravity; `npm run backup-skills` pulls edits made in either agent back into the hub.
 
-> **Why this matters:** When you or an agent create, edit, or update any `SKILL.md` in Antigravity or Claude Code, the changes reflect **instantly in real time across both agents**. No re-sync step is needed for existing skills.
+> **Why this matters:** Antigravity and Claude Code read the same files, so an edit in either agent shows up **instantly in both**. Only the hub needs a step: run `npm run backup-skills` before committing.
 
 ### B. MCP Tools Synchronization
 Both Antigravity and Claude Code use the standard JSON `mcpServers` schema:
@@ -52,7 +52,7 @@ npm run sync
 1. Reads `C:\Users\Asus\.gemini\config\mcp_config.json` and `C:\Users\Asus\.claude.json`.
 2. Backs up existing config files (`.sync.bak`).
 3. Writes the synchronized MCP configuration to both clients.
-4. Creates directory junctions for any newly discovered skills in `skills/<domain>/`.
+4. Copies any new hub skill (`skills/<domain>/`) into Antigravity as a real folder (replacing an old junction if one exists), then links Claude Code to that folder.
 
 ---
 

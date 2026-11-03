@@ -30,15 +30,17 @@ Read these before acting (they are part of this skill):
 | [references/knowledge-notes.md](references/knowledge-notes.md) | `note`, `quiz` |
 
 Per-project state lives in **`.learn/`** at the project root. Never put tutor files
-in the project's `.agents/`, `AGENTS.md` or `CLAUDE.md`: those belong to the agent
-that builds the project.
+in the project's `.agents/`, root `AGENTS.md` or `CLAUDE.md`: those belong to the
+agent that builds the project. `.learn/AGENTS.md` is only a short pointer so any
+agent that opens the folder knows to load this skill and read the tracker first.
 
 ```text
 .learn/
+  AGENTS.md        pointer for any agent: "use codebase-tutor, read TRACKER.md first"
   README.md        how this folder works (from templates/README.md)
   FEATURES.md      Phase 1: feature inventory, verified by the student
   CURRICULUM.md    Phase 2: chosen features in modules, in teaching order
-  TRACKER.md       current position, exact resume point, checkboxes
+  TRACKER.md       exists from `init` on: current phase, position, resume point, checkboxes
   CONCEPTS.md      concept ledger: every concept taught, and where
   blueprint.md     how we study in THIS project: what worked, what failed
   playground.md    the live lesson (read in Markdown Preview)
@@ -55,6 +57,7 @@ The student may type the command or say it in words. Detect the phase from
 
 | Command | Phase | What it does |
 |---|---|---|
+| `status` | any | Returning after a break: where we are, what's done, what's next, in ≤ 8 lines. |
 | `init` | 1 | Scan the codebase → `FEATURES.md`. Then **stop and wait**. |
 | `plan` | 2 | Student's picks → `CURRICULUM.md`, `TRACKER.md`, `CONCEPTS.md`. Then **stop and wait**. |
 | `start` | 3 | Resume or begin the next session → lesson in `playground.md`. |
@@ -70,9 +73,12 @@ The student may type the command or say it in words. Detect the phase from
 ## `init`: Feature inventory (Phase 1)
 
 1. If `.learn/` exists, do not overwrite it: say what is there and ask.
-2. Create `.learn/` with `lessons/` and `captures/`. Copy `templates/README.md`
-   and `templates/playground.md` into `.learn/`. (No `notes/`: notes live in the
-   central knowledge base, see `note`.)
+2. Create `.learn/` with `lessons/` and `captures/`. Copy `templates/README.md`,
+   `templates/AGENTS.md`, `templates/playground.md` and `templates/TRACKER.md` into
+   `.learn/`. Set the tracker's phase to "Phase 1: verify FEATURES.md, then pick
+   features". The tracker must exist from day one, so a student who comes back after
+   a break always finds where they are. (No `notes/`: notes live in the central
+   knowledge base, see `note`.)
 3. Ask once: **commit `.learn/` to git, or keep it local?** For a repo the student
    does not own (company, open source), recommend local: add `.learn/` to
    `.git/info/exclude` (never edit the project's `.gitignore` for this).
@@ -101,10 +107,22 @@ The student may type the command or say it in words. Detect the phase from
 5. Reply with the module list (one line per session) and ask for approval or changes.
 6. **Stop.** Start teaching only after the student says `start` or approves.
 
+## `status`
+
+Read `TRACKER.md` (and `CURRICULUM.md` if present). Reply with: current phase,
+the session in progress and its exact resume point, sessions done / total, open
+decisions waiting on the student, and whether the code changed since the last
+lesson (`git log --oneline <hash>..HEAD -- <files of current features>`). End with
+the one next action. If `.learn/` is missing pieces (no tracker, no `AGENTS.md`),
+create them from the templates and say so.
+
 ## `start`: A session (Phase 3)
 
 1. Read `TRACKER.md` (current position, resume point), `CURRICULUM.md`,
    `CONCEPTS.md`, `blueprint.md`, and the anchor lesson (M0.1 note or lesson).
+   **Never teach without a tracker row.** If the student asks for a single feature
+   before `plan` (a trial lesson, a detour), add it to `TRACKER.md` under
+   "Outside the curriculum" first, then fold it into the curriculum at `plan`.
 2. **Paused session?** If `playground.md` holds an unfinished lesson, resume at the
    exact point in the tracker. Re-orient in 3 lines (where we were, what's next).
    Do not rewrite the lesson.

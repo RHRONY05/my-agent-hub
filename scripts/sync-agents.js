@@ -10,8 +10,9 @@
  * Capabilities:
  * 1. Two-Way MCP Sync: Seamlessly shares MCP servers between Antigravity and Claude Code.
  * 2. Layered Domain Skills Sync: Discovers custom skills organized by domain
- *    (backend, frontend, ui-ux-design, architecture, workflow) and cross-links them
- *    into Antigravity and Claude Code via NTFS Junctions.
+ *    (backend, frontend, ui-ux-design, architecture, workflow, learning), copies each one
+ *    into Antigravity as a real folder (Antigravity ignores junctions), and links Claude
+ *    Code to that folder via an NTFS junction.
  * 3. Safe Backups: Automatically creates .sync.bak files before writing any configuration.
  */
 
@@ -155,28 +156,56 @@ externalLocations.forEach(loc => {
 
 console.log('   📚 Found ' + canonicalSkills.size + ' canonical skills across hub layers & agents.');
 
-const targets = [
-  { name: 'Antigravity', dir: PATHS.geminiSkills },
-  { name: 'Claude Code', dir: PATHS.claudeSkills },
-];
+// Antigravity does not follow directory junctions when discovering skills, so every
+// skill must be a real folder in ~/.gemini/config/skills/ (the live copy). Claude Code
+// follows junctions, so it links into that folder. Edits flow back into the hub with
+// `npm run backup-skills`.
 
+function isLink(p) {
+  try { return fs.lstatSync(p).isSymbolicLink(); } catch (e) { return false; }
+}
+
+let copiedCount = 0;
 let newLinksCount = 0;
 
 for (const [skillName, skillInfo] of canonicalSkills) {
-  targets.forEach(target => {
-    const destPath = path.join(target.dir, skillName);
-    if (!fs.existsSync(destPath)) {
-      try {
-        fs.symlinkSync(skillInfo.sourceDir, destPath, 'junction');
-        newLinksCount++;
-        console.log('   🔗 Linked [' + skillName + '] (' + skillInfo.originName + ') -> ' + target.name);
-      } catch (err) {}
+  const geminiPath = path.join(PATHS.geminiSkills, skillName);
+  const claudePath = path.join(PATHS.claudeSkills, skillName);
+  const fromHub = skillInfo.originName.startsWith('Hub');
+
+  // A. Antigravity: real folder. Replace an old junction only for hub skills.
+  try {
+    if (fromHub && isLink(geminiPath)) {
+      fs.unlinkSync(geminiPath);
+      console.log('   ♻️  Removed junction [' + skillName + '] from Antigravity (not discoverable there)');
     }
-  });
+    if (!fs.existsSync(geminiPath)) {
+      fs.cpSync(skillInfo.sourceDir, geminiPath, { recursive: true, dereference: true });
+      copiedCount++;
+      console.log('   📁 Copied [' + skillName + '] (' + skillInfo.originName + ') -> Antigravity');
+    }
+  } catch (err) {
+    console.warn('   ⚠️ Antigravity copy failed for ' + skillName + ':', err.message);
+  }
+
+  // B. Claude Code: junction into the Antigravity folder. Repoint old hub junctions.
+  try {
+    if (fromHub && isLink(claudePath) &&
+        path.resolve(fs.readlinkSync(claudePath)) !== path.resolve(geminiPath)) {
+      fs.unlinkSync(claudePath);
+    }
+    if (!fs.existsSync(claudePath) && !isLink(claudePath) && fs.existsSync(geminiPath)) {
+      fs.symlinkSync(geminiPath, claudePath, 'junction');
+      newLinksCount++;
+      console.log('   🔗 Linked [' + skillName + '] Claude Code -> Antigravity folder');
+    }
+  } catch (err) {
+    console.warn('   ⚠️ Claude Code link failed for ' + skillName + ':', err.message);
+  }
 }
 
 console.log('\n🎉 Sync Complete!');
 console.log('   - MCP Servers: ' + totalMcpCount + ' synchronized between Antigravity and Claude Code.');
-console.log('   - Skills: ' + canonicalSkills.size + ' active across both agents.');
-console.log('   - Layered Hub skills linked cleanly via zero-copy NTFS junctions.\n');
+console.log('   - Skills: ' + canonicalSkills.size + ' active across both agents (' + copiedCount + ' copied to Antigravity, ' + newLinksCount + ' linked into Claude Code).');
+console.log('   - Antigravity holds real folders; Claude Code links to them. Run `npm run backup-skills` after editing a skill.\n');
 console.log('================================================================\n');
